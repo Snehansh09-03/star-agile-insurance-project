@@ -1,19 +1,20 @@
----
-- name: Configure Docker on Deployserver
-  hosts: [server]
+- name : Configure Docker on EC2 Instances
+  hosts : all
   become: true
-  tasks:
-  - name: apt updating
-    command: sudo apt update
-  - name: Install python and Pip
-    command: sudo apt install -y python-pip
-  - name: Installing Docker
-    command: sudo apt-get install -y docker.io
-    become: yes
-    become_user: root
-  - name: start docker service using systemctl
-    command: sudo systemctl start docker
-    become: yes
-    become_user: root
+  connection : ssh
+  tasks : 
+  - name: updating apt
+    command : sudo apt-get update
+
+  - name : Install Docker
+    become: true
+    apt:
+     name: docker.io
+     state: latest
+     update_cache: yes
+    
+
+  - name : Start Docker Service
+    command : sudo systemctl start docker
   - name: Deploy the Image from DockerHub and Run as Container
     command: docker run -itd -p 8080:8081 shivansh8068/insurance_staragile:1.0
